@@ -52,10 +52,36 @@ namespace Lab1
             StudentHeaderWithID();
             List<StudentInfo> studentList = DataReader();
             foreach (var student in studentList)
-            {
-                Console.WriteLine(string.Format(" {0,-6}{1,-15}{2,-16}{3,5}", student.studentID,
+            {   
+                    Console.WriteLine(string.Format(" {0,-6}{1,-15}{2,-16}{3,5}", student.studentID,
                     student.studentFirstName, student.studentLastName, student.studentGrade));
             }
+        }
+        public static void ViewStudentInfoUpdated(int studentID)
+        {
+            Console.Clear();
+            GradesHeader();
+            StudentHeaderWithID();
+            List<StudentInfo> studentList = DataReader();
+            foreach (var student in studentList)
+            {
+                if (student.studentID == studentID)
+                {
+                    ColorChangerWarning();
+                    Console.WriteLine(string.Format(" {0,-6}{1,-15}{2,-16}{3,5}", student.studentID,
+                    student.studentFirstName, student.studentLastName, student.studentGrade));
+                    Console.ResetColor();
+                }
+                else if (student.studentID != studentID)
+                {
+                    Console.WriteLine(string.Format(" {0,-6}{1,-15}{2,-16}{3,5}", student.studentID,
+                    student.studentFirstName, student.studentLastName, student.studentGrade));
+                }
+            }            
+            ColorChangerWarning();
+            Console.Write(" \n Grade Updated. Press any key to continue.");
+            Console.ReadKey();
+            Console.ResetColor();
         }
         public static List<StudentInfo> DataReader()
         {
@@ -81,7 +107,7 @@ namespace Lab1
             }
             return studentList;
         }
-        static void OverallGradeInformation()
+        public static void OverallGradeInformation()
         {
             List<StudentInfo> studentList = DataReader();
             int studentListCount = studentList.Count; // Counts the amount of elelemnts in a list
@@ -99,84 +125,84 @@ namespace Lab1
             Console.WriteLine(" Bottom Grade: {0}", minGrade);
             Console.ResetColor();
         }
-        public static void Grades()
+        public static int GetStudentID(string ID, int studentCount)
         {
-            List<StudentInfo> studentList = DataReader();
-            int studentListCount = studentList.Count, studentID, studentListCountTest = studentList.Max(x => x.studentID);
-            ColorChangerWarning();
-            Console.WriteLine("\n Type \"Q\" to cancel this operation: ");
-            Console.ResetColor();
-            ColorChanger();
-            Console.Write("\n Type the Student ID for which you want to add or edit a grade to: ");                 
-            while (true) // Takes Student ID
+            int studentID;
+            while (true)
             {
                 try
                 {
-                    ColorChangerWarning();
-                    string studentIDEntry = Console.ReadLine().Trim().ToLower();
-                    Console.ResetColor();
-                    if (studentIDEntry == "q")
+                    if (ID == "q")
                     {
                         break;
                     }
-                    else if (int.TryParse(studentIDEntry, out int testVariable) == true &&
-                            (int.Parse(studentIDEntry) < 0 ||
-                            int.Parse(studentIDEntry) > studentListCountTest) ||
-                            int.TryParse(studentIDEntry, out testVariable) == false)
+                    else if (int.TryParse(ID, out int testVariable) == true &&
+                            (int.Parse(ID) < 0 ||
+                            int.Parse(ID) > studentCount) ||
+                            int.TryParse(ID, out testVariable) == false)
                     {
                         ColorChangerWarning();
                         Console.Write(" You have made an invalid input.Please try again: ");
+                        ID = Console.ReadLine().Trim().ToLower();
                         throw new Exception();
                     }
                     else
                     {
-                        studentID = int.Parse(studentIDEntry);
-                        ColorChanger();
-                        Console.Write(" Type in the new grade: ");                        
-                        while (true) // Takes Student Grade and writes to CSV file
+                        studentID = int.Parse(ID);
+                        return studentID;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return 0;
+        }
+        public static void WriteToFile(List<StudentInfo> list)
+        {
+            List<string> updatedStudentStringLines = new List<string>();
+            foreach (StudentInfo student in list)
+            {
+                updatedStudentStringLines.Add($"{student.studentID},{student.studentFirstName}," +
+                    $"{student.studentLastName},{student.studentGrade}");
+            }
+            // Writes CSV file                
+            File.WriteAllLines("studentmanagement.csv", updatedStudentStringLines);
+
+        }
+        public static void ErrorMessage()
+        {
+            ColorChangerWarning();
+            Console.Write(" You have made an invalid input.Please try again: ");
+        }
+        public static void AddEditNewGrades(List<StudentInfo> studentList, int studentID, string studentGradeEntry)
+        {
+            while (true)
+            {
+                try
+                {
+                    ColorChangerWarning();                    
+                    Console.ResetColor();
+                    if (studentGradeEntry == "q")
+                    {
+                        break;
+                    }
+                    if ((int.Parse(studentGradeEntry) < 0 || int.Parse(studentGradeEntry) > 100) ||
+                        int.TryParse(studentGradeEntry, out int testVariable) == false)
+                    {
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        foreach (StudentInfo student in studentList)
                         {
-                            try
+                            if (student.studentID == studentID)
                             {
-                                ColorChangerWarning();
-                                string studentGradeEntry = Console.ReadLine().Trim().ToLower();
-                                Console.ResetColor();
-                                if (studentGradeEntry == "q")
-                                {
-                                    break;
-                                }
-                                if ((int.Parse(studentGradeEntry) < 0 || int.Parse(studentGradeEntry) > 100) ||
-                                    int.TryParse(studentGradeEntry, out testVariable) == false)
-                                {
-                                    ColorChangerWarning();
-                                    Console.Write(" You have made an invalid input.Please try again: ");
-                                    throw new Exception();
-                                }
-                                else
-                                {
-                                    foreach (StudentInfo studenta in studentList)
-                                    {
-                                        if(studenta.studentID == int.Parse(studentIDEntry))
-                                        {
-                                            studentList[studentList.IndexOf(studenta)].studentGrade = int.Parse(studentGradeEntry);
-                                            // Converts list items into string so it can be passed into a CSV file
-                                            List<string> updatedStudentStringLines = new List<string>();
-                                            foreach (StudentInfo studentb in studentList)
-                                            {
-                                                updatedStudentStringLines.Add($"{studentb.studentID},{studentb.studentFirstName}," +
-                                                    $"{studentb.studentLastName},{studentb.studentGrade}");
-                                            }
-                                            // Writes CSV file                
-                                            File.WriteAllLines("studentmanagement.csv", updatedStudentStringLines);
-                                            Console.ResetColor();
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                            catch
-                            {
-                                continue;
+                                studentList[studentList.IndexOf(student)].studentGrade = int.Parse(studentGradeEntry);
+                                WriteToFile(studentList);
+                                ViewStudentInfoUpdated(studentID);
+                                break;
                             }
                         }
                         break;
@@ -184,9 +210,33 @@ namespace Lab1
                 }
                 catch
                 {
+                    ColorChangerWarning();
+                    Console.Write(" You have made an invalid input.Please try again: ");
+                    studentGradeEntry = Console.ReadLine().Trim().ToLower();
                     continue;
                 }
-            }            
+            }
+        }
+        public static void Grades()
+        {
+            List<StudentInfo> studentList = DataReader();
+            int studentListCount = studentList.Count, studentID, studentListCountTest = studentList.Max(x => x.studentID);
+            string studentIDEntry, studentGradeEntry;
+
+            ColorChangerWarning();
+            Console.WriteLine("\n Type \"Q\" to cancel this operation: ");
+            Console.ResetColor();
+            ColorChanger();
+            Console.Write("\n Type the Student ID for which you want to add or edit a grade to: ");
+            ColorChangerWarning();
+            studentIDEntry = Console.ReadLine().Trim().ToLower();
+            studentID = GetStudentID(studentIDEntry, studentListCountTest);
+            Console.ResetColor();
+            ColorChanger();
+            Console.Write(" Type in the new grade: ");
+            ColorChangerWarning();
+            studentGradeEntry = Console.ReadLine().Trim().ToLower();
+            AddEditNewGrades(studentList, studentID, studentGradeEntry);                    
         }
         public static bool Students()
         {
