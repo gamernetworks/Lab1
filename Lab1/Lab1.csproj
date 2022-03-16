@@ -58,6 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataManagement.cs" />
+    <Compile Include="Headers.cs" />
+    <Compile Include="Menus.cs" />
     <Compile Include="StudentManagement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
