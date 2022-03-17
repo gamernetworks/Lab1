@@ -111,19 +111,80 @@ namespace Lab1
         public static void OverallGradeInformation()
         {
             List<StudentInfo> studentList = DataManagement.DataReader();
-            int studentListCount = studentList.Count; // Counts the amount of elelemnts in a list
+            int studentListCount = studentList.Count, topStudentCount =0, topStudentHelp = 0, bottomStudentCount = 0,
+                bottomStudentHelp = 0;
             double studentListGrades = 0;
+
             foreach (var student in studentList) // Adds all the student grades in list studentList
             {
                 studentListGrades += student.studentGrade;
             }
             double averageGrade = Math.Round(studentListGrades / studentListCount, 2);
-            ColorChangerCaution();
-            Console.WriteLine("\n Class Average: {0}", averageGrade);
+            ColorChangerWarning();
+            Console.Write("\n Class Average: ");
+            Console.ResetColor();
+            Console.Write(averageGrade);
+            ColorChangerWarning();
             int maxGrade = studentList.Max(x => x.studentGrade);
-            Console.WriteLine(" Top Grade: {0}", maxGrade);
+            Console.Write("\n Top Grade ({0}) earned by: ", maxGrade);
+            foreach (var student in studentList)
+            {
+                if(student.studentGrade == maxGrade)
+                {
+                    topStudentCount++;
+                }
+            }
+            Console.ResetColor();
+            foreach (var student in studentList)
+            {
+                if(student.studentGrade == maxGrade)
+                {
+                    topStudentHelp++;                    
+                    if (topStudentHelp < topStudentCount)
+                    {
+                        Console.Write(student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + "., ");
+                    }
+                    else if (topStudentCount == 1)
+                    {
+                        Console.Write(student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + ".");
+                    }
+                    else
+                    {
+                        Console.Write("and " + student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + ".");
+                    }
+                }
+            }
+
+            ColorChangerWarning();            
             int minGrade = studentList.Min(x => x.studentGrade);
-            Console.WriteLine(" Bottom Grade: {0}", minGrade);
+            Console.Write("\n Bottom Grade ({0}) earned by: ", minGrade);
+            foreach (var student in studentList)
+            {
+                if (student.studentGrade == minGrade)
+                {
+                    bottomStudentCount++;
+                }
+            }
+            Console.ResetColor();            
+            foreach (var student in studentList)
+            {
+                if (student.studentGrade == minGrade)
+                {
+                    bottomStudentHelp++;
+                    if (bottomStudentHelp < bottomStudentCount)
+                    {
+                        Console.WriteLine(student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + "., ");
+                    }
+                    else if (bottomStudentCount == 1)
+                    {
+                        Console.WriteLine(student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + ".");
+                    }
+                    else
+                    {
+                        Console.WriteLine("and " + student.studentFirstName + " " + student.studentLastName.Substring(0, 1) + ".");
+                    }
+                }
+            }
             Console.ResetColor();
         }
         public static string GetStudentID(string studentIDEntry, int studentListCountTest)
@@ -160,7 +221,7 @@ namespace Lab1
         }
         public static void AddEditGrades()
         {
-            List<StudentInfo> studentList = DataManagement.DataReader();
+            List<StudentInfo> studentList = DataReader();
             int studentListCount = studentList.Count, studentListCountTest = studentList.Max(x => x.studentID);                
             string studentIDEntry, studentGradeEntry, studentID;
             
